@@ -1,0 +1,73 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>轻巧的jQuery提示框插件Tipso演示</title>
+<link rel="stylesheet" href="./index.css">
+<style>
+* { margin: 0; padding: 0;}
+body { font-family: "Microsoft Yahei";}
+h1 { padding: 45px 0; font: 32px "Microsoft Yahei"; text-align: center;}
+.dowebok { width: 500px; margin: 30px auto 0; border: 1px solid #ddd;}
+.dowebok h2 { padding: 10px; font-size: 16px; font-weight: 400; background-color: #f5f5f5;}
+.dowebok .inner { padding: 60px; text-align: center;}
+.dowebok p { margin-top: 10px; font-size: 14px;}
+.dowebok input { margin-right: 10px; padding: 5px; border: 1px solid #ddd; font-family: "Microsoft Yahei";}
+.inner span {border: 1px solid red; padding: 5px;}
+</style>
+</head>
+
+<body>
+<h1>jQuery提示框插件poptip演示</h1>
+
+<div class="dowebok">
+	<h2>1、默认 7点</h2>
+	<div class="inner"><span class="tip" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+</div>
+
+<div class="dowebok">
+	<h2>2、右边显示 10点</h2>
+	<div class="inner"><span class="tip" data-poptip-arrow="10" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+</div>
+<div class="dowebok">
+    <h2>3、下边显示 11点</h2>
+    <div class="inner"><span class="tip" data-poptip-arrow="11" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+</div>
+
+<div class="dowebok">
+    <h2>4、下边显示 1点</h2>
+    <div class="inner"><span class="tip" data-poptip-arrow="1" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+</div>
+
+<div class="dowebok">
+    <h2>5、左边显示 2点</h2>
+    <div class="inner"><span class="tip" data-poptip-arrow="2" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+</div>
+
+<div class="dowebok">
+    <h2>6、上边显示 5点</h2>
+    <div class="inner"><span class="tip" data-poptip-arrow="5" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+</div>
+
+<div class="dowebok">
+    <h2>7、focus</h2>
+    <div class="inner"><input class="tip" data-poptip-type="focus" data-poptip-arrow="10" data-poptip-content="我是内容 我是内容"></div>
+</div>
+
+<div class="dowebok">
+    <h2>8. click</h2>
+    <div class="inner"><span class="tip" data-poptip-type="click" data-poptip-content="猛戳我， 编编">猛戳我</span></div>
+</div>
+
+<script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.js"></script>
+<script src="./index.js"></script>
+<script>
+$(function() {
+    $('.tip').poptip()
+});
+</script>
+
+
+</body>
+</html>

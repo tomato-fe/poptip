@@ -1,0 +1,13 @@
+{
+  "name": "tabs",
+  "repo": "tomato-fe/tabs",
+  "description": "jq plug tabs",
+  "version": "0.1.0",
+  "keywords": ["tabs", "jq"],
+  "main": "dist/index.js",
+  "files": [
+  	"dist/index.css",
+  	"dist/index.js"
+  ],
+  "license": "MIT"
+}
