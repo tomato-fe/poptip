@@ -6,6 +6,7 @@
 		arrow           : 7,
         type            : 'hover',  
 		delay           : 200,
+        container       : null,
 		content         : null,
 		onBeforeShow    : null,
 		onShow          : null,
@@ -57,6 +58,8 @@
         }
         return ret       
     }
+
+    
     $.extend(Poptip.prototype, {
     	init: function() {
     		var obj = this,
@@ -136,22 +139,43 @@
             return this
         },
         reposition: function() {
+            var arrow = parseInt(this.settings.arrow, 10),
+                bubble = this.tip_bubble
+
+            var positionMap = this._getPosition(arrow)
+
+            positionMap = this._makesureInViewport( positionMap )
+
+            this._renderArrow(positionMap.arrow)
+            bubble.css( {
+                left: positionMap.left,
+                top: positionMap.top
+            } )
+            return this
+        },
+        destroy: function() {
+            var $el = this.element
+
+            $el.off('.' + __plugName__)
+            $el.removeData(__plugName__)
+            $el.attr('title', this._title)
+        },
+        _getPosition: function(arrow) {
             var $el = this.element,
-                elPosi = $el.offset(),
                 bubble = this.tip_bubble,
-                settings = this.settings,
-                arrow = parseInt(settings.arrow, 10),
+                elPosi = $el.offset(),
                 positionMap = {
-                    left: $el.offset().left,
-                    top: $el.offset().top
-                }
-
-            bubble.find('.ui-poptip-arrow').addClass('ui-poptip-arrow-' + arrow)
-
-            var direction = '',
+                    arrow: arrow,
+                    left: elPosi.left,
+                    top: elPosi.top,
+                    right: elPosi.left,
+                    bottom: elPosi.top
+                },
+                direction = '',
                 gap = 10,
-                arrowShift = 0;
-
+                arrowShift = 0,
+                w = bubble.outerWidth(),
+                h = bubble.outerHeight()
             switch(arrow) {
                 case 10:
                     direction = 'right'
@@ -161,14 +185,14 @@
                     break;
                 case 1:
                     direction = 'bottom'
-                    arrowShift = $el.outerWidth() - bubble.outerWidth()
+                    arrowShift = $el.outerWidth() - w
                     break;
                 case 2:
                     direction = 'left'
                     break;
                 case 5:
                     direction = 'top'
-                    arrowShift = $el.outerWidth() - bubble.outerWidth()
+                    arrowShift = $el.outerWidth() - w
                     break;
                 default: // 7
                     direction = 'top'
@@ -176,7 +200,7 @@
 
             switch(direction) {
                 case 'top':
-                    positionMap.top -= (bubble.outerHeight() + gap)
+                    positionMap.top -= (h + gap)
                     positionMap.left +=  arrowShift
                     break;
                 case 'bottom':
@@ -184,23 +208,77 @@
                     positionMap.left +=  arrowShift
                     break;
                 case 'left':
-                    positionMap.left -= ( bubble.outerWidth() + gap )
+                    positionMap.left -= ( w + gap )
                     break;
                 case 'right':
                     positionMap.left += ( $el.outerWidth() + gap )
                     break;
             }
-            
-            bubble.css( positionMap )
 
-            return this
+            positionMap.right = positionMap.left + w
+            positionMap.bottom = positionMap.top + h
+
+            return positionMap
         },
-        destroy: function() {
-            var $el = this.element
+        _makesureInViewport: function (positionMap) {
+            var direct = {
+                    'left': 0,
+                    'top': 1,
+                    'right': 2,
+                    'bottom': 3
+                },
+                arrowMap = {
+                    '1': 5,
+                    '5': 1,
+                    '7': 11,
+                    '11': 7,
+                    '10': 2,
+                    '2': 10
+                },
+                ap = positionMap.arrow,
+                $container = this.settings.container ? $(this.settings.container) : null,
+                rs = positionMap,
+                changeAp,
+                containment
+            // $container
+            if ($container && $container.length) {
+                var posi = $container.offset(),
+                    h =   $container.outerHeight(),
+                    w = $container.outerWidth()  
+                containment = [posi.left, posi.top, posi.left + w, posi.top + h]
+            } else {
+                // window
+                var $win = $(window),
+                    left = $win.scrollLeft(),
+                    top = $win.scrollTop(),
+                    h =   $win.outerHeight(),
+                    w = $win.outerWidth()
+                containment = [left, top, left + w, top + h]
+            }
 
-            $el.off('.' + __plugName__)
-            $el.removeData(__plugName__)
-            $el.attr('title', this._title)
+            if ( (ap == 7 || ap == 5) && (containment[direct.top] > positionMap.top) ) {
+                // tip 溢出屏幕上方
+                changeAp = arrowMap[ap]
+            } else if( (ap == 11 || ap == 1) && (containment[direct.bottom] < positionMap.bottom) ) {
+                // tip 溢出屏幕下方
+                changeAp = arrowMap[ap]
+            } else if( (ap == 10) && (containment[direct.right] < positionMap.right) ) {
+                // tip 溢出屏幕右边
+                changeAp = arrowMap[ap]
+            } else if( (ap == 2 ) && (containment[direct.left] > positionMap.left) ) {
+                // tip 溢出屏幕左边
+                changeAp = arrowMap[ap]
+            }
+            if (changeAp) {
+                rs = this._getPosition(changeAp)
+            }
+            return rs
+        },
+        _renderArrow: function(arrow) {
+            var bubble = this.tip_bubble,
+                prev = bubble.data('poptip-arrow-current')
+            bubble.find('.ui-poptip-arrow').removeClass('ui-poptip-arrow-' + prev).addClass('ui-poptip-arrow-' + arrow)
+            bubble.data('poptip-arrow-current', arrow)
         }
     })
 
