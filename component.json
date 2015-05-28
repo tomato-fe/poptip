@@ -1,9 +1,9 @@
 {
-  "name": "tabs",
-  "repo": "tomato-fe/tabs",
-  "description": "jq plug tabs",
+  "name": "poptip",
+  "repo": "tomato-fe/poptip",
+  "description": "jq plug poptip",
   "version": "0.1.0",
-  "keywords": ["tabs", "jq"],
+  "keywords": ["poptip", "jq"],
   "main": "dist/index.js",
   "files": [
   	"dist/index.css",
