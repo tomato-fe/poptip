@@ -6,6 +6,7 @@
         arrow           : 7,
         type            : 'hover',  
         delay           : 200,
+        item            : null,//子代绑定
         container       : null,
         content         : null,
         onBeforeShow    : null,
@@ -26,8 +27,7 @@
 
     var __plugName__ = 'tc.poptip'
 
-    var template = '' + "<div class=\"ui-poptip\">\r\n    <div class=\"ui-poptip-container\">\r\n        <div class=\"ui-poptip-arrow\">\r\n            <em></em>\r\n            <span></span>\r\n        </div>\r\n        <div class=\"ui-poptip-content\" data-role=\"content\"></div>\r\n    </div>\r\n</div>"
-
+    var template = "<div class=\"ui-poptip\">\r\n    <div class=\"ui-poptip-container\">\r\n        <div class=\"ui-poptip-arrow\">\r\n            <em></em>\r\n            <span></span>\r\n        </div>\r\n        <div class=\"ui-poptip-content\" data-role=\"content\"></div>\r\n    </div>\r\n</div>"
     function Poptip(element, options) {
         this.element = $(element)
         // 提取 data 设置
@@ -67,7 +67,10 @@
                 triggerType = this.settings.type
 
             $el.removeAttr('title')
-            if (triggerType === 'click') {
+            if (triggerType === 'none') {
+                obj.show()
+            }
+            else if (triggerType === 'click') {
                 $el.on('click.' + __plugName__, function(e) {
                     obj.toggle()
                 })
@@ -89,7 +92,7 @@
         },
         _bubble: function() {
             if (!this.tip_bubble) {
-                this.tip_bubble = $(template).appendTo('body');
+                this.tip_bubble = $(template).appendTo('body').hide();
             }
             return this.tip_bubble
         },
@@ -289,17 +292,26 @@
     function Plugin(option, params) {
         return this.each(function () {
             var $this = $(this),
-                data  = $this.data(__plugName__),
-                options
+                data  = $this.data(__plugName__)
 
-            if (typeof option === 'object') 
-                options = option
+            if (typeof option === 'object' && option.item)  {
+                var triggerType = eventMap[option.type || defaults.type]
+                $this.on(triggerType.showEvent, option.item, function(e) {
+                    option.item = null
+                    data = $(this).data(__plugName__)    
+                    if (!data) $(this).data(__plugName__, (data = new Poptip(this, option) ) );
 
-            if (!data) $this.data(__plugName__, (data = new Poptip(this, options) ) );
+                    data.show()                 
+                })
+            } 
+            else {
+                if (!data) $this.data(__plugName__, (data = new Poptip(this, option) ) );
 
-            if (typeof option === 'string') 
-                data[option](params)
+                if (typeof option === 'string') 
+                    data[option](params)
+            }
         })
+
     }
 
     $.fn.poptip = Plugin

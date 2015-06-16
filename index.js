@@ -2,15 +2,16 @@
     'use strict';
     
     var defaults = {
-		theme           : '',
-		arrow           : 7,
+        theme           : '',
+        arrow           : 7,
         type            : 'hover',  
-		delay           : 200,
+        delay           : 200,
+        item            : null,//子代绑定
         container       : null,
-		content         : null,
-		onBeforeShow    : null,
-		onShow          : null,
-		onHide          : null
+        content         : null,
+        onBeforeShow    : null,
+        onShow          : null,
+        onHide          : null
     }
 
     var eventMap = {
@@ -26,18 +27,17 @@
 
     var __plugName__ = 'tc.poptip'
 
-    var template = '' + __inline('tip.tpl')
-
+    var template = __inline('tip.tpl')
     function Poptip(element, options) {
-    	this.element = $(element)
+        this.element = $(element)
         // 提取 data 设置
         var dataApi = _getDataApi(this.element)
 
-    	this.settings = $.extend({}, defaults, dataApi, options)
-    	this._title = this.element.attr('title')
+        this.settings = $.extend({}, defaults, dataApi, options)
+        this._title = this.element.attr('title')
         this.mode = 'hide'
 
-    	this.init()
+        this.init()
     }
 
     function _getDataApi($element) {
@@ -61,13 +61,16 @@
 
     
     $.extend(Poptip.prototype, {
-    	init: function() {
-    		var obj = this,
-    			$el = this.element,
+        init: function() {
+            var obj = this,
+                $el = this.element,
                 triggerType = this.settings.type
 
             $el.removeAttr('title')
-            if (triggerType === 'click') {
+            if (triggerType === 'none') {
+                obj.show()
+            }
+            else if (triggerType === 'click') {
                 $el.on('click.' + __plugName__, function(e) {
                     obj.toggle()
                 })
@@ -76,23 +79,24 @@
                         obj.hide()
                     }
                 });
-            } else {
+            } 
+            else {
                 var eventObj = eventMap[triggerType] || eventMap['hover']
-        		$el.on(eventObj.showEvent + '.' + __plugName__, function() {
-        			obj.show()
-        		})
-        		$el.on(eventObj.hideEvent + '.' + __plugName__, function() {
-        			obj.hide()
-        		})
+                $el.on(eventObj.showEvent + '.' + __plugName__, function() {
+                    obj.show()
+                })
+                $el.on(eventObj.hideEvent + '.' + __plugName__, function() {
+                    obj.hide()
+                })
             }
-    	},
+        },
         _bubble: function() {
             if (!this.tip_bubble) {
-                this.tip_bubble = $(template).appendTo('body');
+                this.tip_bubble = $(template).appendTo('body').hide();
             }
             return this.tip_bubble
         },
-    	show: function() {
+        show: function() {
             var obj = this
             if (obj.mode == 'hide') {
                 var bubble = obj._bubble()
@@ -106,7 +110,7 @@
                     obj.mode = 'show'
                 }, obj.settings.delay)
             }
-    	},
+        },
         hide: function() {
             var obj = this
 
@@ -159,6 +163,7 @@
             $el.off('.' + __plugName__)
             $el.removeData(__plugName__)
             $el.attr('title', this._title)
+            this.tip_bubble && this.tip_bubble.remove()
         },
         _getPosition: function(arrow) {
             var $el = this.element,
@@ -285,19 +290,28 @@
     // PLUG 定义
     // ==========================
     function Plugin(option, params) {
-        this.each(function () {
+        return this.each(function () {
             var $this = $(this),
-                data  = $this.data(__plugName__),
-                options
+                data  = $this.data(__plugName__)
 
-            if (typeof option === 'object') 
-                options = option
+            if (typeof option === 'object' && option.item)  {
+                var triggerType = eventMap[option.type || defaults.type]
+                $this.on(triggerType.showEvent, option.item, function(e) {
+                    option.item = null
+                    data = $(this).data(__plugName__)    
+                    if (!data) $(this).data(__plugName__, (data = new Poptip(this, option) ) );
 
-            if (!data) $this.data(__plugName__, (data = new Poptip(this, options) ) );
+                    data.show()                 
+                })
+            } 
+            else {
+                if (!data) $this.data(__plugName__, (data = new Poptip(this, option) ) );
 
-            if (typeof option === 'string') 
-                data[option](params)
+                if (typeof option === 'string') 
+                    data[option](params)
+            }
         })
+
     }
 
     $.fn.poptip = Plugin
