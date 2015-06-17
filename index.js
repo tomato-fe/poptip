@@ -28,6 +28,7 @@
     var __plugName__ = 'tc.poptip'
 
     var template = __inline('tip.tpl')
+    
     function Poptip(element, options) {
         this.element = $(element)
         // 提取 data 设置
@@ -36,6 +37,7 @@
         this.settings = $.extend({}, defaults, dataApi, options)
         this._title = this.element.attr('title')
         this.mode = 'hide'
+        this.timeout = null
 
         this.init()
     }
@@ -100,8 +102,8 @@
             var obj = this
             if (obj.mode == 'hide') {
                 var bubble = obj._bubble()
-                obj.content().reposition()
 
+                obj.content().reposition()
                 $.isFunction(obj.settings.onBeforeShow) && obj.settings.onBeforeShow( obj )
 
                 obj.timeout = window.setTimeout(function() {
@@ -114,9 +116,9 @@
         hide: function() {
             var obj = this
 
-            window.clearTimeout(obj.timeout);
-            obj.timeout = null;
-            obj.tip_bubble.hide()
+            window.clearTimeout(obj.timeout)
+            obj.timeout = null
+            obj.tip_bubble && obj.tip_bubble.hide()
             $.isFunction(obj.settings.onHide) && obj.settings.onHide( obj )
             obj.mode = 'hide'
         },
@@ -127,15 +129,16 @@
             var bubble = this._bubble(),
                 $el = this.element,
                 settings = this.settings,
-                ctn = bubble.find('[data-role="content"]')
+                ctn = bubble.find('[data-role="content"]'),
+                content = settings.content
 
             if (msg != null) {
-                settings.content = msg + ''
+                content = msg + ''
             } 
-            if (settings.content === null) {
-                settings.content = $el.data('poptip-content')
+            else if( $.isFunction(content) ) {
+                content = content.call($el)
             }
-            ctn && ctn.html(settings.content)
+            ctn && ctn.html(content)
 
             if (msg != null) {
                 this.reposition()
@@ -232,11 +235,17 @@
                     'right': 2,
                     'bottom': 3
                 },
-                arrowMap = {
+                verticalMap = {
                     '1': 5,
                     '5': 1,
                     '7': 11,
-                    '11': 7,
+                    '11': 7
+                },
+                crossMap = {
+                    '5': 7,
+                    '7': 5,
+                    '11': 1,
+                    '1': 11,
                     '10': 2,
                     '2': 10
                 },
@@ -260,23 +269,30 @@
                     w = $win.outerWidth()
                 containment = [left, top, left + w, top + h]
             }
-
+            // 纵向
             if ( (ap == 7 || ap == 5) && (containment[direct.top] > positionMap.top) ) {
                 // tip 溢出屏幕上方
-                changeAp = arrowMap[ap]
+                ap = changeAp = verticalMap[ap]
             } else if( (ap == 11 || ap == 1) && (containment[direct.bottom] < positionMap.bottom) ) {
                 // tip 溢出屏幕下方
-                changeAp = arrowMap[ap]
-            } else if( (ap == 10) && (containment[direct.right] < positionMap.right) ) {
-                // tip 溢出屏幕右边
-                changeAp = arrowMap[ap]
-            } else if( (ap == 2 ) && (containment[direct.left] > positionMap.left) ) {
-                // tip 溢出屏幕左边
-                changeAp = arrowMap[ap]
+                ap = changeAp = verticalMap[ap]
             }
+            // 横向 // tip 溢出屏幕右边/左边
+            if (containment[direct.right] < positionMap.right || containment[direct.left] > positionMap.left) {
+                ap = changeAp = crossMap[ap]
+            }
+
             if (changeAp) {
                 rs = this._getPosition(changeAp)
             }
+
+            // 上下切换后可能再左右溢出
+            if (containment[direct.right] < positionMap.right) {
+                rs = this._getPosition(2)
+            }else if (containment[direct.left] > positionMap.left) {
+                rs = this._getPosition(10)
+            }
+            
             return rs
         },
         _renderArrow: function(arrow) {
@@ -299,9 +315,10 @@
                 $this.on(triggerType.showEvent, option.item, function(e) {
                     option.item = null
                     data = $(this).data(__plugName__)    
-                    if (!data) $(this).data(__plugName__, (data = new Poptip(this, option) ) );
-
-                    data.show()                 
+                    if (!data) {
+                        $(this).data(__plugName__, (data = new Poptip(this, option) ) )
+                        data.show()
+                    }
                 })
             } 
             else {
