@@ -2,7 +2,7 @@
   "name": "poptip",
   "repo": "tomato-fe/poptip",
   "description": "jq plug poptip",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "keywords": ["poptip", "jq"],
   "main": "dist/index.js",
   "files": [
