@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <title>轻巧的jQuery提示框插件Tipso演示</title>
-<link rel="stylesheet" href="./index.css">
+<link rel="stylesheet" href="index.css">
 <style>
 * { margin: 0; padding: 0;}
 body { font-family: "Microsoft Yahei";}
@@ -23,48 +23,59 @@ h1 { padding: 45px 0; font: 32px "Microsoft Yahei"; text-align: center;}
 
 <div class="dowebok">
 	<h2>1、默认 7点</h2>
-	<div class="inner"><span class="tip" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+	<div class="inner"><span id="tip_1" class="tip" data-poptip-content="我是内容 我是内容">Tipso</span></div>
 </div>
 
 <div class="dowebok">
 	<h2>2、右边显示 10点</h2>
-	<div class="inner"><span class="tip" data-poptip-arrow="10" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+	<div class="inner"><span id="tip_2" class="tip" data-poptip-arrow="10" data-poptip-content="我是内容 我是内容">Tipso</span></div>
 </div>
 <div class="dowebok">
     <h2>3、下边显示 11点</h2>
-    <div class="inner"><span class="tip" data-poptip-arrow="11" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+    <div class="inner"><span id="tip_3" class="tip" data-poptip-arrow="11" data-poptip-content="我是内容 我是内容">Tipso</span></div>
 </div>
 
 <div class="dowebok">
     <h2>4、下边显示 1点</h2>
-    <div class="inner"><span class="tip" data-poptip-arrow="1" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+    <div class="inner"><span id="tip_4" class="tip" data-poptip-arrow="1" data-poptip-content="我是内容 我是内容">Tipso</span></div>
 </div>
 
 <div class="dowebok">
     <h2>5、左边显示 2点</h2>
-    <div class="inner"><span class="tip" data-poptip-arrow="2" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+    <div class="inner"><span id="tip_5" class="tip" data-poptip-arrow="2" data-poptip-content="我是内容 我是内容">Tipso</span></div>
 </div>
 
 <div class="dowebok">
     <h2>6、上边显示 5点</h2>
-    <div class="inner"><span class="tip" data-poptip-arrow="5" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+    <div class="inner"><span id="tip_6" class="tip" data-poptip-arrow="5" data-poptip-content="我是内容 我是内容">Tipso</span></div>
 </div>
 
 <div class="dowebok">
     <h2>7、focus</h2>
-    <div class="inner"><input class="tip" data-poptip-type="focus" data-poptip-arrow="10" data-poptip-content="我是内容 我是内容"></div>
+    <div class="inner"><input id="tip_7" class="tip" data-poptip-type="focus" data-poptip-arrow="10" data-poptip-content="我是内容 我是内容"></div>
 </div>
 
 <div class="dowebok">
     <h2>8. click</h2>
-    <div class="inner"><span class="tip" data-poptip-type="click" data-poptip-content="猛戳我， 编编">猛戳我</span></div>
+    <div class="inner"><span id="tip_8" class="tip" data-poptip-type="click" data-poptip-content="猛戳我， 编编">猛戳我</span></div>
+</div>
+
+
+<div class="dowebok" id="live_bind">
+    <h2>动态绑定</h2>
+    <div class="inner"><span class="tip" data-poptip-content="我是内容 我是内容">Tipso</span></div>
+    <div class="inner"><span class="tip" data-poptip-content="我是内容 我是内容">Tipso</span></div>
 </div>
 
 <script src="http://cdn.bootcss.com/jquery/1.9.1/jquery.js"></script>
-<script src="./index.js"></script>
+<script src="index.js"></script>
 <script>
 $(function() {
-    $('.tip').poptip()
+    $('.tip').poptip();
+
+    // $('#live_bind').poptip({
+    //     item: '.tip'
+    // })
 });
 </script>
 
